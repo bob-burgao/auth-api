@@ -2,6 +2,8 @@ package routes_v1
 
 import (
 	controllers_v1 "auth/adapters/controllers/v1"
+	domain_adapter "auth/domains/adapters"
+	domain_service "auth/domains/services"
 
 	"github.com/labstack/echo/v4"
 )
@@ -9,7 +11,11 @@ import (
 func SetUpAuthRoute(r *echo.Echo) {
 	basePath := "/api/v1/auth"
 
-	authController := controllers_v1.NewLoginController()
+	tokenService := domain_service.NewTokenService()
+	authService := domain_service.NewAuthService(*tokenService)
+	authAdapter := domain_adapter.NewAuthAdapter(*authService)
+
+	authController := controllers_v1.NewLoginController(authAdapter)
 
 	r.POST(basePath, authController.AuthWithLoginAndPass)
 }

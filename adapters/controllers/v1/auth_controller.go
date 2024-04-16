@@ -1,17 +1,17 @@
 package controllers_v1
 
 import (
-	domain_adapter "auth/domains/adapters"
+	domain_port_input "auth/domains/ports/input"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
 type AuthController struct {
-	authAdapter domain_adapter.AuthAdapter
+	authAdapter domain_port_input.LoginInputPort
 }
 
-func NewLoginController(authAdapter domain_adapter.AuthAdapter) *AuthController {
+func NewLoginController(authAdapter domain_port_input.LoginInputPort) *AuthController {
 	return &AuthController{
 		authAdapter: authAdapter,
 	}
@@ -19,6 +19,11 @@ func NewLoginController(authAdapter domain_adapter.AuthAdapter) *AuthController 
 
 func (c *AuthController) AuthWithLoginAndPass(ctx echo.Context) error {
 	//body := ctx.Request().Body
-	c.authAdapter.Login("alberico", "123456")
-	return ctx.String(http.StatusProcessing, "Recived the request with success, will be working to make the best report for you!!!")
+	token, err := c.authAdapter.Login("alberico", "123456")
+
+	if err != nil {
+		return ctx.String(http.StatusBadRequest, "Login error")
+	}
+
+	return ctx.JSON(http.StatusAccepted, token)
 }
