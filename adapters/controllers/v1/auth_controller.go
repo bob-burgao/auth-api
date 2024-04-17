@@ -2,6 +2,7 @@ package controllers_v1
 
 import (
 	adapter_util "auth/adapters/utils"
+	domain_config "auth/domains/config"
 	domain_port_input "auth/domains/ports/input"
 	"fmt"
 	"net/http"
@@ -14,13 +15,15 @@ import (
 type AuthController struct {
 	authAdapter domain_port_input.LoginInputPort
 	logger      zerolog.Logger
+	envs        *domain_config.Environments
 }
 
-func NewLoginController(authAdapter domain_port_input.LoginInputPort) *AuthController {
+func NewLoginController(authAdapter domain_port_input.LoginInputPort, envs *domain_config.Environments) *AuthController {
 
 	return &AuthController{
 		authAdapter: authAdapter,
-		logger:      log.With().Str("service", "my-service").Str("class", "AuthController").Logger(),
+		logger:      log.With().Str("service", envs.MsName).Str("class", "AuthController").Logger(),
+		envs:        envs,
 	}
 }
 
