@@ -21,12 +21,14 @@ func (a *TokenService) GenerateToken(customer domain_model.Customer) (*domain_mo
 	now := time.Now()
 	timeToExpire := now.Add(1 * time.Hour * 24)
 	expiresAt := jwt.NewNumericDate(timeToExpire)
+	// TODO - Implementar a recuperação de chave Publica e Privada
 	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 
 	if err != nil {
 		return nil, err
 	}
 
+	// TODO - Implementar um corpo válido
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodES256,
 		&jwt.RegisteredClaims{
@@ -47,7 +49,8 @@ func (a *TokenService) GenerateToken(customer domain_model.Customer) (*domain_mo
 	}
 
 	return &domain_model.AuthResult{
-		Token:      tokenSigned,
+		Token: tokenSigned,
+		// TODO - Corrigir o valor do tempo de Expired token
 		ExpireTime: timeToExpire.Second(),
 	}, nil
 }
