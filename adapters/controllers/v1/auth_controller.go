@@ -1,42 +1,53 @@
 package controllers_v1
 
 import (
+	adapter_util "auth/adapters/utils"
 	domain_port_input "auth/domains/ports/input"
-	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 type AuthController struct {
 	authAdapter domain_port_input.LoginInputPort
+	logger      zerolog.Logger
 }
 
 func NewLoginController(authAdapter domain_port_input.LoginInputPort) *AuthController {
+
 	return &AuthController{
 		authAdapter: authAdapter,
+		logger:      log.With().Str("service", "my-service").Str("class", "AuthController").Logger(),
 	}
 }
 
 func (c *AuthController) AuthWithLoginAndPass(ctx echo.Context) error {
-	//body := ctx.Request().Body
-	jsonBody := make(map[string]interface{})
-	err := json.NewDecoder(ctx.Request().Body).Decode(&jsonBody)
-	if err != nil {
-
-		log.Error("empty json body")
-		return nil
+	requiredParams := []string{"login", "password"}
+	jsonBody, errGetParams := adapter_util.GetControllerBodyData(ctx.Request(), requiredParams)
+	if errGetParams != nil {
+		return ctx.String(http.StatusBadRequest, errGetParams.Error())
 	}
 
-	login := jsonBody["login"].(string)
-	pass := jsonBody["password"].(string)
+	body := *jsonBody
+	login := body[requiredParams[0]].(string)
+	pass := body[requiredParams[1]].(string)
+
+	c.logger.Info().Msg(fmt.Sprintf("init login: %s", login))
 
 	token, err := c.authAdapter.Login(ctx.Request().Context(), login, pass)
 
 	if err != nil {
-		return ctx.String(http.StatusBadRequest, "Login error")
+		return ctx.String(http.StatusUnauthorized, "Login error")
 	}
 
+	c.logger.Info().Msg(fmt.Sprintf("success login: %s", login))
+
 	return ctx.JSON(http.StatusAccepted, token)
+}
+
+func (c *AuthController) RecoverPass(ctx echo.Context) error {
+	return ctx.String(http.StatusAccepted, "feito")
 }
