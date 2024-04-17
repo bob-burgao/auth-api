@@ -13,6 +13,9 @@ type Environments struct {
 	MsName      string        `mapstructure:"MS_NAME"`
 	SelfTimeOut time.Duration `mapstructure:"SELF_TIME_OUT"`
 	SelfPort    string        `mapstructure:"SELF_PORT"`
+
+	DynamoUrl string `mapstructure:"DYNAMO_URL"`
+	AwsRegion string `mapstructure:"AWS_REGION"`
 }
 
 func LoadEnvVars() *Environments {
@@ -20,6 +23,9 @@ func LoadEnvVars() *Environments {
 	viper.SetDefault("MS_NAME", "ms-auth")
 	viper.SetDefault("SELF_TIME_OUT", 30*time.Second)
 	viper.SetDefault("SELF_PORT", "8080")
+
+	viper.SetDefault("DYNAMO_URL", "https://localhost.localstack.cloud:4566")
+	viper.SetDefault("AWS_REGION", "us-east-1")
 
 	viper.AutomaticEnv()
 

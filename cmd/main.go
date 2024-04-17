@@ -3,6 +3,7 @@ package main
 import (
 	"auth/adapters/controllers/routes"
 	routes_v1 "auth/adapters/controllers/routes/v1"
+	config_dynamodb "auth/configs/dynamodb"
 	domain_config "auth/domains/config"
 	"context"
 	"fmt"
@@ -24,9 +25,12 @@ func setUpDataSource() {
 	h := echo.New()
 
 	envs := domain_config.LoadEnvVars()
+	ctx := context.Background()
+
+	dbClient := config_dynamodb.CreateLocalClient(envs.DynamoUrl, envs.AwsRegion, ctx)
 
 	routes.SetUpHealthRoute(h)
-	routes_v1.SetUpAuthRoute(h)
+	routes_v1.SetUpAuthRoute(h, dbClient)
 
 	err := start(h, envs)
 	if err != nil {

@@ -19,7 +19,7 @@ func NewLoginController(authAdapter domain_port_input.LoginInputPort) *AuthContr
 
 func (c *AuthController) AuthWithLoginAndPass(ctx echo.Context) error {
 	//body := ctx.Request().Body
-	token, err := c.authAdapter.Login("alberico", "123456")
+	token, err := c.authAdapter.Login(ctx, "alberico", "123456")
 
 	if err != nil {
 		return ctx.String(http.StatusBadRequest, "Login error")
