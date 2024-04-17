@@ -16,7 +16,7 @@ func NewTokenService() *TokenService {
 	return &TokenService{}
 }
 
-func (a *TokenService) GenerateToken(customer domain_model.CustomerLogged) (*domain_model.AuthResult, error) {
+func (a *TokenService) GenerateToken(customer domain_model.Customer) (*domain_model.AuthResult, error) {
 
 	now := time.Now()
 	timeToExpire := now.Add(1 * time.Hour * 24)

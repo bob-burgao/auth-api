@@ -2,30 +2,32 @@ package domain_service
 
 import (
 	domain_model "auth/domains/models"
+	domain_port_output "auth/domains/ports/output"
+	"context"
 )
 
 type AuthService struct {
-	tokenService TokenService
+	tokenService   TokenService
+	userRepository domain_port_output.UserOutputPort
 }
 
-func NewAuthService(tokenService TokenService) *AuthService {
+func NewAuthService(tokenService TokenService, userRepository domain_port_output.UserOutputPort) *AuthService {
 	return &AuthService{
-		tokenService: tokenService,
+		tokenService:   tokenService,
+		userRepository: userRepository,
 	}
 }
 
-func (a *AuthService) Login(login string, password string) (*domain_model.AuthResult, error) {
+func (a *AuthService) Login(ctx context.Context, login string, password string) (*domain_model.AuthResult, error) {
 
-	customerData := domain_model.CustomerLogged{
-		Id:    "068614e8-81fe-420a-a8a7-658ab0f5f706",
-		Name:  "Albérico",
-		Roles: []string{"commum", "teste"},
+	customerData, errFindUser := a.userRepository.FindUserByLoginAndPass(ctx, login, password)
+	if errFindUser != nil {
+		return nil, errFindUser
 	}
 
-	generatedToken, err := a.tokenService.GenerateToken(customerData)
-
-	if err != nil {
-		return nil, err
+	generatedToken, errGenerateToken := a.tokenService.GenerateToken(*customerData)
+	if errGenerateToken != nil {
+		return nil, errGenerateToken
 	}
 
 	return generatedToken, nil
