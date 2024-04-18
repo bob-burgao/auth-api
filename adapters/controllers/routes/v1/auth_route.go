@@ -12,15 +12,22 @@ import (
 )
 
 func SetUpAuthRoute(r *echo.Echo, db *dynamodb.Client) {
-	basePath := "/api/v1/auth"
 	envs := domain_config.LoadEnvVars()
 
+	//Init Data Repository
 	userRepository := repository_dynamo.NewUsersRepository(db, envs)
+
+	//Init Domain Services
 	tokenService := domain_service.NewTokenService()
 	authService := domain_service.NewAuthService(*tokenService, userRepository, envs)
+
+	//Init Domain Input
 	authAdapter := domain_adapter.NewAuthAdapter(*authService)
 
+	//Init controller
 	authController := controllers_v1.NewLoginController(authAdapter, envs)
 
-	r.POST(basePath, authController.AuthWithLoginAndPass)
+	r.POST(envs.BasePathV1+"/auth", authController.AuthWithLoginAndPass)
+	r.POST(envs.BasePathV1+"/recover-pass", authController.RecoverPass)
+	r.POST(envs.BasePathV1+"/change-pass", authController.ChangePass)
 }

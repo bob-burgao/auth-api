@@ -54,3 +54,7 @@ func (c *AuthController) AuthWithLoginAndPass(ctx echo.Context) error {
 func (c *AuthController) RecoverPass(ctx echo.Context) error {
 	return ctx.String(http.StatusAccepted, "feito")
 }
+
+func (c *AuthController) ChangePass(ctx echo.Context) error {
+	return ctx.String(http.StatusAccepted, "feito")
+}

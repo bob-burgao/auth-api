@@ -16,6 +16,8 @@ type Environments struct {
 
 	DynamoUrl string `mapstructure:"DYNAMO_URL"`
 	AwsRegion string `mapstructure:"AWS_REGION"`
+
+	BasePathV1 string `mapstructure:"BASE_PATH_V1"`
 }
 
 func LoadEnvVars() *Environments {
@@ -26,6 +28,8 @@ func LoadEnvVars() *Environments {
 
 	viper.SetDefault("DYNAMO_URL", "https://localhost.localstack.cloud:4566")
 	viper.SetDefault("AWS_REGION", "us-east-1")
+
+	viper.SetDefault("BASE_PATH_V1", "/api/v1")
 
 	viper.AutomaticEnv()
 
